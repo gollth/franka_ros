@@ -23,6 +23,23 @@ jobs:
         file: .ci/Dockerfile.${{ env.ROS_DISTRO }}
         push: false
         
+    - name: Check Format
+      uses: addnab/docker-run-action@v3
+      with: 
+        image: franka_ros:${{ env.ROS_DISTRO }}
+        options: -v ${{github.workspace}}:/ros/src/franka_ros
+        run: |
+          catkin config --workspace /ros/ --init --extend /opt/ros/$ROS_DISTRO --merge-devel --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          catkin build --workspace /ros/ --no-deps --make-args check-format -- franka_control franka_gripper franka_gazebo franka_hw franka_example_controllers franka_visualization
+    - name: Check Lint
+      uses: addnab/docker-run-action@v3
+      with: 
+        image: franka_ros:${{ env.ROS_DISTRO }}
+        options: -v ${{github.workspace}}:/ros/src/franka_ros
+        run: |
+          catkin config --workspace /ros/ --init --extend /opt/ros/${{ env.ROS_DISTRO }} --merge-devel --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          catkin build --workspace /ros/ --no-deps --make-args check-tidy -- franka_control franka_gripper franka_gazebo franka_hw franka_example_controllers franka_visualization
+          
     - name: Build
       uses: addnab/docker-run-action@v3
       with:
@@ -32,24 +49,3 @@ jobs:
           catkin config --workspace /ros/ --init --extend /opt/ros/$ROS_DISTRO --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
           catkin build --workspace /ros/
           
-    - name: Check Format
-      uses: addnab/docker-run-action@v3
-      with: 
-        image: franka_ros:${{ env.ROS_DISTRO }}
-        options: -v ${{github.workspace}}:/ros/src/franka_ros
-        run: |
-          catkin config --workspace /ros/ --init --extend /opt/ros/$ROS_DISTRO --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-          catkin build --workspace /ros/ --no-deps --make-args check-format -- franka_control franka_gripper franka_gazebo franka_hw franka_example_controllers franka_visualization
-    - name: Check Lint
-      uses: addnab/docker-run-action@v3
-      with: 
-        image: franka_ros:${{ env.ROS_DISTRO }}
-        options: -v ${{github.workspace}}:/ros/src/franka_ros
-        run: |
-          catkin config --workspace /ros/ --init --extend /opt/ros/${{ env.ROS_DISTRO }} --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-          catkin build --workspace /ros/ --no-deps --make-args check-tidy -- franka_control franka_gripper franka_gazebo franka_hw franka_example_controllers franka_visualization
-          
-   
-          
-        
-    
