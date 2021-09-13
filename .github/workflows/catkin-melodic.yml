@@ -1,0 +1,33 @@
+name: Catkin
+
+on: 
+  pull_request:
+    branches: 
+    - melodic-devel
+
+jobs:
+  catkin:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Build Docker image
+    - uses: docker/build-push-action@v2
+      with:
+        tags: franka_ros:melodic
+        file: .ci/Dockerfile
+        push: false
+      
+    - name: Build in Docker
+    - uses: addnab/docker-run-action@v3
+      with:
+        image: franka_ros:melodic
+        shell: bash
+        options: -v ${{github.workspace}}:/ros/src/franka_ros
+        run: |
+          sudo apt install ros-melodic-libfranka
+          catkin init --workspace /ros/
+          catkin config --workspace /ros/ --DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          catkin build --workspace /ros/
+        
+    
