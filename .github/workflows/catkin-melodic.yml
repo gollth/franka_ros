@@ -6,10 +6,7 @@ on:
     - kinetic-devel
     - melodic-devel
     - noetic-devel
-
-env:
-  ROS_DISTRO: 
-
+    
 jobs:
   catkin:
     runs-on: ubuntu-latest
@@ -22,14 +19,14 @@ jobs:
     - name: Build Docker image
       uses: docker/build-push-action@v2
       with:
-        tags: franka_ros:$ROS_DISTRO
-        file: .ci/Dockerfile.$ROS_DISTRO
+        tags: franka_ros:${{ env.ROS_DISTRO }}
+        file: .ci/Dockerfile.${{ env.ROS_DISTRO }}
         push: false
       
     - name: Check Format
       uses: addnab/docker-run-action@v3
       with: 
-        image: franka_ros:$ROS_DISTRO
+        image: franka_ros:${{ env.ROS_DISTRO }}
         options: -v ${{github.workspace}}:/ros/src/franka_ros
         run: |
           catkin config --workspace /ros/ --init --extend /opt/ros/$ROS_DISTRO --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
@@ -37,16 +34,16 @@ jobs:
     - name: Check Lint
       uses: addnab/docker-run-action@v3
       with: 
-        image: franka_ros:$ROS_DISTRO
+        image: franka_ros:${{ env.ROS_DISTRO }}
         options: -v ${{github.workspace}}:/ros/src/franka_ros
         run: |
-          catkin config --workspace /ros/ --init --extend /opt/ros/$ROS_DISTRO --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          catkin config --workspace /ros/ --init --extend /opt/ros/${{ env.ROS_DISTRO }} --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
           catkin build --no-deps --make-args check-tidy -- franka_control franka_gripper franka_gazebo franka_hw franka_example_controllers franka_visualization
           
     - name: Build
       uses: addnab/docker-run-action@v3
       with:
-        image: franka_ros:$ROS_DISTRO
+        image: franka_ros:${{ env.ROS_DISTRO }}
         options: -v ${{github.workspace}}:/ros/src/franka_ros
         run: |
           catkin config --workspace /ros/ --init --extend /opt/ros/$ROS_DISTRO --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
