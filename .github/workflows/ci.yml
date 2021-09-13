@@ -1,0 +1,88 @@
+name: Catkin
+
+on: 
+  pull_request:
+    branches: 
+    - kinetic-devel
+    - melodic-devel
+    - noetic-devel
+    
+jobs:
+  catkin:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Parse ROS Distro
+      run: echo "ROS_DISTRO=$(echo ${{ github.event.pull_request.base.ref }} | sed 's/-devel//')" >> $GITHUB_ENV
+    
+    - name: Build Docker image
+      uses: docker/build-push-action@v2
+      with:
+        tags: franka_ros:${{ env.ROS_DISTRO }}
+        file: .ci/Dockerfile.${{ env.ROS_DISTRO }}
+        push: false
+        
+   
+    - name: Check Format
+      uses: addnab/docker-run-action@v3
+      with: 
+        image: franka_ros:${{ env.ROS_DISTRO }}
+        options: -v ${{github.workspace}}:/ros/src/franka_ros
+        run: |
+          catkin_init_workspace /ros/src
+          mkdir -p /ros/build && cd /ros/build
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../src
+          cmake --build . --target check-format
+          
+    - name: Check Lint
+      uses: addnab/docker-run-action@v3
+      with: 
+        image: franka_ros:${{ env.ROS_DISTRO }}
+        options: -v ${{github.workspace}}:/ros/src/franka_ros
+        run: |
+          catkin_init_workspace /ros/src
+          mkdir -p /ros/build && cd /ros/build
+          cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../src
+          cmake --build . --target check-tidy
+          
+    - name: Catkin Tools
+      uses: addnab/docker-run-action@v3
+      with:
+        image: franka_ros:${{ env.ROS_DISTRO }}
+        options: -v ${{github.workspace}}:/ros/src/franka_ros
+        run: |
+          catkin config --workspace /ros/ --init --extend /opt/ros/$ROS_DISTRO --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          catkin build --workspace /ros/
+          
+    - name: Catkin Make
+      uses: addnab/docker-run-action@v3
+      with:
+        image: franka_ros:${{ env.ROS_DISTRO }}
+        options: -v ${{github.workspace}}:/ros/src/franka_ros
+        run: |
+          catkin_init_workspace /ros/src
+          cd /ros
+          catkin_make -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          
+    - name: Prepare Tests
+      run: mkdir -p ${{github.workspace}}/reports
+      
+    - name: Run Tests
+      uses: addnab/docker-run-action@v3
+      with:
+        image: franka_ros:${{ env.ROS_DISTRO }}
+        options: -v ${{github.workspace}}:/ros/src/franka_ros -v ${{github.workspace}}/reports:/ros/reports
+        shell: bash
+        run: |
+          catkin config --workspace /ros/ --init --extend /opt/ros/$ROS_DISTRO --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          catkin build --verbose --interleave-output --catkin-make-args run_tests
+          cp /ros/build/*/test_results/*/rosunit-*.xml /ros/reports
+          
+    - name: Report Test Results
+      uses: dorny/test-reporter@v1
+      if: success() || failure()    # run this step even if previous step failed
+      with:
+        name: ROS Unit Tests
+        path: reports/*.xml 
+        reporter: java-junit
