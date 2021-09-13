@@ -17,7 +17,7 @@ jobs:
     - uses: actions/checkout@v2
     
     - name: Parse ROS Distro
-    - run: echo "ROS_DISTRO=$(echo ${{ github.event.pull_request.base.ref }} | sed 's/-devel//')" >> $GITHUB_ENV
+      run: echo "ROS_DISTRO=$(echo ${{ github.event.pull_request.base.ref }} | sed 's/-devel//')" >> $GITHUB_ENV
     
     - name: Build Docker image
       uses: docker/build-push-action@v2
