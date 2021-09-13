@@ -26,7 +26,7 @@ jobs:
         options: -v ${{github.workspace}}:/ros/src/franka_ros
         run: |
           catkin init --workspace /ros/
-          catkin config --workspace /ros/ --DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          catkin config --workspace /ros/ --extend /opt/ros/melodic --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
           catkin build --workspace /ros/
         
     
