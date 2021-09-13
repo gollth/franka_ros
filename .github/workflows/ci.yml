@@ -30,6 +30,7 @@ jobs:
       with: 
         image: franka_ros:${{ env.ROS_DISTRO }}
         options: -v ${{github.workspace}}:/ros/src/franka_ros
+        shell: bash
         run: |
           catkin_init_workspace /ros/src
           mkdir -p /ros/build && cd /ros/build
