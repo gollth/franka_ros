@@ -20,18 +20,19 @@ jobs:
     - name: Build Docker image
       uses: docker/build-push-action@v2
       with:
-        tags: franka_ros:${{ env.ROS_DISTRO }}
-        file: .ci/Dockerfile.${{ env.ROS_DISTRO }}
+        tags: franka_ros:${{env.ROS_DISTRO}}
+        file: .ci/Dockerfile.${{env.ROS_DISTRO}}
         push: false
         
    
     - name: Check Format
       uses: addnab/docker-run-action@v3
       with: 
-        image: franka_ros:${{ env.ROS_DISTRO }}
+        image: franka_ros:${{env.ROS_DISTRO}}
         options: -v ${{github.workspace}}:/ros/src/franka_ros
         shell: bash
         run: |
+          source /opt/ros/${{env.ROS_DISTRO}}/setup.bash
           catkin_init_workspace /ros/src
           mkdir -p /ros/build && cd /ros/build
           cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../src
@@ -40,10 +41,11 @@ jobs:
     - name: Check Lint
       uses: addnab/docker-run-action@v3
       with: 
-        image: franka_ros:${{ env.ROS_DISTRO }}
+        image: franka_ros:${{env.ROS_DISTRO}}
         options: -v ${{github.workspace}}:/ros/src/franka_ros
         shell: bash
         run: |
+          source /opt/ros/${{env.ROS_DISTRO}}/setup.bash
           catkin_init_workspace /ros/src
           mkdir -p /ros/build && cd /ros/build
           cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../src
@@ -52,20 +54,21 @@ jobs:
     - name: Catkin Tools
       uses: addnab/docker-run-action@v3
       with:
-        image: franka_ros:${{ env.ROS_DISTRO }}
+        image: franka_ros:${{env.ROS_DISTRO}}
         options: -v ${{github.workspace}}:/ros/src/franka_ros
         shell: bash
         run: |
-          catkin config --workspace /ros/ --init --extend /opt/ros/$ROS_DISTRO --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          catkin config --workspace /ros/ --init --extend /opt/ros/${{env.ROS_DISTRO}} --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
           catkin build --workspace /ros/
           
     - name: Catkin Make
       uses: addnab/docker-run-action@v3
       with:
-        image: franka_ros:${{ env.ROS_DISTRO }}
+        image: franka_ros:${{env.ROS_DISTRO}}
         options: -v ${{github.workspace}}:/ros/src/franka_ros
         shell: bash
         run: |
+          source /opt/ros/${{env.ROS_DISTRO}}/setup.bash
           catkin_init_workspace /ros/src
           cd /ros
           catkin_make -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
