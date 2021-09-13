@@ -15,7 +15,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         tags: franka_ros:melodic
-        file: .ci/Dockerfile
+        file: .ci/Dockerfile.melodic
         push: false
       
     - name: Build in Docker
