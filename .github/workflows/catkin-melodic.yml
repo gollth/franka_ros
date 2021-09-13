@@ -18,15 +18,22 @@ jobs:
         file: .ci/Dockerfile.melodic
         push: false
       
-    - name: Build in Docker
+    - name: Check Format
+      uses: addnab/docker-run-action@v3
+      with: 
+        image: franka_ros:melodic
+        options: -v ${{github.workspace}}:/ros/src/franka_ros
+        run: |
+          catkin config --workspace /ros/ --init --extend /opt/ros/melodic --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          catkin build --workspace /ros/ --no-deps --make-args -- franka
+    
+    - name: Build
       uses: addnab/docker-run-action@v3
       with:
         image: franka_ros:melodic
-        shell: bash
         options: -v ${{github.workspace}}:/ros/src/franka_ros
         run: |
-          catkin init --workspace /ros/
-          catkin config --workspace /ros/ --extend /opt/ros/melodic --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-          catkin build --workspace /ros/
+          catkin config --workspace /ros/ --init --extend /opt/ros/melodic --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          catkin build --no-deps --make-args check-format -- franka_control franka_gripper franka_gazebo franka_hw franka_example_controllers franka_visualization
         
     
