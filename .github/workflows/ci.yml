@@ -41,6 +41,7 @@ jobs:
       with: 
         image: franka_ros:${{ env.ROS_DISTRO }}
         options: -v ${{github.workspace}}:/ros/src/franka_ros
+        shell: bash
         run: |
           catkin_init_workspace /ros/src
           mkdir -p /ros/build && cd /ros/build
@@ -52,6 +53,7 @@ jobs:
       with:
         image: franka_ros:${{ env.ROS_DISTRO }}
         options: -v ${{github.workspace}}:/ros/src/franka_ros
+        shell: bash
         run: |
           catkin config --workspace /ros/ --init --extend /opt/ros/$ROS_DISTRO --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
           catkin build --workspace /ros/
@@ -61,6 +63,7 @@ jobs:
       with:
         image: franka_ros:${{ env.ROS_DISTRO }}
         options: -v ${{github.workspace}}:/ros/src/franka_ros
+        shell: bash
         run: |
           catkin_init_workspace /ros/src
           cd /ros
