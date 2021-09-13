@@ -12,11 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Prepare
+      # Keep the compilation outputs persitant outside the docker container to use for the other steps
       run: |
         mkdir -p ${{github.workspace}}/src       # where the repo will be cloned into
         mkdir -p ${{github.workspace}}/build     # compilation cache for formatter & linter
         mkdir -p ${{github.workspace}}/devel     # compilation cache for formatter & linter
-        mkdir -p ${{github.workspace}}/reports   # test results
         
     - name: Checkout
       uses: actions/checkout@v2
@@ -26,23 +26,23 @@ jobs:
     - name: Parse ROS Distro
       run: echo "ROS_DISTRO=$(echo ${{ github.event.pull_request.base.ref }} | sed 's/-devel//')" >> $GITHUB_ENV
     
-    - name: Build Docker image
+    - name: Build Docker Image
       uses: docker/build-push-action@v2
       with:
         tags: franka_ros:${{env.ROS_DISTRO}}
         file: .ci/Dockerfile.${{env.ROS_DISTRO}}
         push: false
    
-    - name: Catkin Tools
+    - name: Compile with Catkin Tools
       uses: addnab/docker-run-action@v3
       with:
         image: franka_ros:${{env.ROS_DISTRO}}
         options: -v ${{github.workspace}}/src:/ros/src/  # only mount source here
         run: |
           catkin config --workspace /ros/ --init --extend /opt/ros/${{env.ROS_DISTRO}} --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-          catkin build --workspace /ros/
+          catkin build --workspace /ros/ --interleave-output --verbose
           
-    - name: Catkin Make
+    - name: Compile with Catkin Make
       uses: addnab/docker-run-action@v3
       with:
         image: franka_ros:${{env.ROS_DISTRO}}
@@ -62,9 +62,9 @@ jobs:
         shell: bash
         run: |
           source /ros/devel/setup.bash
-          cmake --build . --target check-format
+          cmake --build /ros/build --target check-format
           
-    - name: Check Lint
+    - name: Check Linting
       uses: addnab/docker-run-action@v3
       with: 
         image: franka_ros:${{env.ROS_DISTRO}}
@@ -72,7 +72,7 @@ jobs:
         shell: bash
         run: |
           source /ros/devel/setup.bash
-          cmake --build . --target check-format
+          cmake --build /ros/build --target check-format
 
     - name: Run Tests
       uses: addnab/docker-run-action@v3
@@ -82,12 +82,13 @@ jobs:
         shell: bash
         run: |
           source /ros/devel/setup.bash
+          cd /ros
           catkin_make run_tests
           
     - name: Report Test Results
       uses: dorny/test-reporter@v1
       if: success() || failure()    # run this step even if previous step failed
       with:
-        name: ROS Unit Tests
-        path: build/test_results/*.xml 
+        name: ROS-Unit Tests
+        path: build/test_results/*/rosunit-*.xml 
         reporter: java-junit
