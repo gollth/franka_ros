@@ -11,7 +11,8 @@ jobs:
   catkin:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
     
     - name: Parse ROS Distro
       run: echo "ROS_DISTRO=$(echo ${{ github.event.pull_request.base.ref }} | sed 's/-devel//')" >> $GITHUB_ENV
