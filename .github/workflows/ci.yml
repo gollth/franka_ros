@@ -8,7 +8,7 @@ on:
     - noetic-devel
     
 jobs:
-  catkin:
+  CI:
     runs-on: ubuntu-latest
     steps:
     - name: Prepare
@@ -95,7 +95,7 @@ jobs:
     - name: Create Test Report
       uses: dorny/test-reporter@v1
       with:
-        artifacts: test-tesults
+        artifact:  test-tesults
         name:      ROS-Unit Tests
         path:      '*.xml'           # Path to test results (inside artifact .zip)
         reporter:  java-junit
