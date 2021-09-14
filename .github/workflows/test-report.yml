@@ -14,5 +14,5 @@ jobs:
       with:
         artifact:  test-results
         name:      ROS-Unit Tests
-        path:      '*.xml'           # Path to test results (inside artifact .zip)
+        path:      '**.xml'           # Path to test results (inside artifact .zip)
         reporter:  java-junit
