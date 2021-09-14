@@ -91,11 +91,3 @@ jobs:
       with:
         name: test-results
         path: build/test_results/*/rosunit-*.xml
-        
-    - name: Create Test Report
-      uses: dorny/test-reporter@v1
-      with:
-        artifact:  test-tesults
-        name:      ROS-Unit Tests
-        path:      '*.xml'           # Path to test results (inside artifact .zip)
-        reporter:  java-junit
