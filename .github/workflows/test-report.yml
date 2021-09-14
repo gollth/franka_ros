@@ -6,13 +6,13 @@ on:
     types:     [completed]
     
 jobs:
-  report:
+  Report:
     runs-on: ubuntu-latest
     steps:
     - name: Create Test Report
       uses: dorny/test-reporter@v1
       with:
-        artifact:  test-tesults
+        artifact:  test-results
         name:      ROS-Unit Tests
         path:      '*.xml'           # Path to test results (inside artifact .zip)
         reporter:  java-junit
