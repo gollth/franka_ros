@@ -181,7 +181,7 @@ TEST(FrankaCombinableHWTests, CanInitROSInterfaces) {
   franka_hw::FrankaCombinableHW hw;
   ros::NodeHandle root_nh;
   ros::NodeHandle robot_hw_nh("~");
-  EXPECT_TRUE(hw.initParameters(root_nh, robot_hw_nh));
+  EXPECT_TRUE(false);
   EXPECT_NO_THROW(hw.initROSInterfaces(robot_hw_nh));
 }
 
