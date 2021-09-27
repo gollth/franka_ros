@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.9.0 - UNRELEASED
+
+* No further ROS Kinetic support, since [End-of-Life was in April 2021](http://wiki.ros.org/Distributions)
+
 ## 0.8.1 - 2021-09-08
 
 Requires `libfranka` >= 0.8.0
