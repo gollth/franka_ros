@@ -260,7 +260,8 @@
       <axis xyz="0 0 1"/>
       <limit effort="12" lower="-2.8973" upper="2.8973" velocity="2.6100"/>
     </joint>
-    <link name="${arm_id}_link8">
+    <link name="${arm_id}_link8"/>
+    <link name="${arm_id}_link8_sc">
       <collision>
         <origin xyz="0.0424 0.0424 -0.0250" rpy="${pi} ${pi/2} ${pi/2}"/>
         <geometry>
@@ -285,5 +286,11 @@
       <parent link="${arm_id}_link7"/>
       <child link="${arm_id}_link8"/>
     </joint>
+
+    <joint name="${arm_id}_link8_sc_joint" type="fixed">
+      <parent link="${arm_id}_link8" />
+      <child link="${arm_id}_link8_sc" />
+    </joint>
+
   </xacro:macro>
 </robot>
