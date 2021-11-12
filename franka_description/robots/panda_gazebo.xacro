@@ -11,7 +11,7 @@
   <!-- || Paolo Robuffo Giordano, Alessandro de Luca                || -->
   <!-- =============================================================== -->
 
-  <xacro:macro name="panda_arm" params="arm_id:='panda' connected_to:='' xyz:='0 0 0' rpy:='0 0 0'">
+  <xacro:macro name="arm" params="arm_id:='panda' connected_to:='' xyz:='0 0 0' rpy:='0 0 0'">
     <xacro:unless value="${not connected_to}">
       <joint name="${arm_id}_joint_${connected_to}" type="fixed">
         <parent link="${connected_to}"/>
@@ -19,7 +19,6 @@
         <origin rpy="${rpy}" xyz="${xyz}"/>
       </joint>
     </xacro:unless>
-
     <link name="${arm_id}_link0">
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
