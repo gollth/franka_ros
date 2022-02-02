@@ -58,3 +58,12 @@ franka_state_controller:
     - panda_joint6
     - panda_joint7
   arm_id: panda
+
+franka_gripper:
+  action_ns: gripper_action
+  type: GripperCommand
+  default: true
+  parallel: true
+  joints:
+    - panda_finger_joint1
+    - panda_finger_joint2
