@@ -2,12 +2,17 @@
 <launch>
   <arg name="robot_ip" />
 
-  <include file="$(find franka_control)/launch/franka_control.launch">
-    <arg name="robot_ip" value="$(arg robot_ip)" />
-    <arg name="load_gripper" value="false" />
+  <arg name="transmission" value="position" />
+  <!-- <arg name="load_gripper" value="false" /> -->
+
+  <include file="$(find franka_control)/launch/franka_control.launch" pass_all_args="true" />
+
+  <!-- TODO: https://github.com/ros-planning/panda_moveit_config/issues/96#issuecomment-1028086188 -->
+  <include file="$(find panda_moveit_config)/launch/move_group.launch" pass_all_args="true">
+    <!-- <arg name="transmission" value="$(arg transmission)" /> -->
+    <!-- <arg name="load_gripper" value="false" /> -->
   </include>
-  <include file="$(find panda_moveit_config)/launch/panda_moveit.launch">
-    <arg name="load_gripper" value="false" />
-  </include>
+
   <node name="move_to_start" pkg="franka_example_controllers" type="move_to_start.py" output="screen" required="true" />
+
 </launch>
