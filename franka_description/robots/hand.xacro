@@ -10,7 +10,7 @@
         <origin xyz="${xyz}" rpy="${rpy}"/>
       </joint>
     </xacro:unless>
-    <xacro:link arm_id="${arm_id}" name="hand">
+    <xacro:panda_link arm_id="${arm_id}" name="hand">
       <self_collision_geometries>
       <collision>
         <origin xyz="0 0 0.04" rpy="0 ${pi/2} ${pi/2}"/>
@@ -49,7 +49,7 @@
         </geometry>
       </collision>
       </self_collision_geometries>
-    </xacro:link>
+    </xacro:panda_link>
 
     <!-- Define the hand_tcp frame -->
     <link name="${arm_id}_hand_tcp" />

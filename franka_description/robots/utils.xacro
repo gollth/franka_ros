@@ -9,7 +9,7 @@
   <!-- name:  Name of the robot link (without prefix)             -->
   <!-- self_collision_geometries:  self <collision> models        -->
   <!-- ========================================================== -->
-  <xacro:macro name="link" params="arm_id name **self_collision_geometries">
+  <xacro:macro name="panda_link" params="arm_id name **self_collision_geometries">
     <!-- sub-link defining detailed meshes for collision with environment -->
     <link name="${arm_id}_${name}">
       <visual>
